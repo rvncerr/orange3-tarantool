@@ -19,9 +19,12 @@ class TarantoolWidget(OWWidget):
 
     host = Setting('localhost')
     port = Setting(3301)
+    user = Setting('')
+    passwd = Setting('')
     space = Setting('')
     index = Setting(0)
     select = Setting('')
+    schema = Setting({})
     raw_tuples = []
 
     class Error(OWWidget.Error):
@@ -36,6 +39,8 @@ class TarantoolWidget(OWWidget):
         connection_box = gui.widgetBox(self.controlArea, 'Connection')
         address_edit = gui.lineEdit(connection_box, self, 'host', 'Host')
         port_spin = gui.spin(connection_box, self, 'port', 0, 65535, label='Port')
+        user_edit = gui.lineEdit(connection_box, self, 'user', 'User')
+        passwd_edit = gui.lineEdit(connection_box, self, 'passwd', 'Password')
 
         data_box = gui.widgetBox(self.controlArea, 'Data')
         space_edit = gui.lineEdit(data_box, self, 'space', 'Space')
@@ -46,14 +51,28 @@ class TarantoolWidget(OWWidget):
 
         self.domain_editor = QTableWidget(0, 7, self)
         self.domain_editor.setHorizontalHeaderLabels(['Name', 'Type', 'Miss', 'Min', 'Max', 'Mean', 'Std'])
+        self.domain_editor.itemChanged.connect(self.domain_change)
         self.controlArea.layout().addWidget(self.domain_editor)
 
-        apply_button = gui.button(self.controlArea, self, "Apply", callback=self.apply_data, autoDefault=False)
+        self.apply_button = gui.button(self.controlArea, self, "Apply", callback=self.apply_data, autoDefault=False)
+        self.apply_button.setEnabled(False)
+
+    def domain_change(self, item):
+        if item.column() == 0:
+            self.schema[self.schema_key][int(item.row())] = str(self.domain_editor.item(item.row(), 0).data(Qt.DisplayRole))
 
     def load_data(self):
         try:
-            database = tarantool.connect(self.host, self.port)
+            if self.user == '':
+                database = tarantool.connect(self.host, self.port)
+            else:
+                database = tarantool.connect(self.host, self.port, user=self.user, password=self.passwd)
             space = database.space(self.space)
+
+            self.schema_key = "%s:%d:%s" % (self.host, self.port, self.space)
+            if self.schema_key not in self.schema.keys():
+                self.schema[self.schema_key] = {}
+
             if self.select == '':
                 self.raw_tuples = space.select(index=self.index)
             else:
@@ -72,8 +91,12 @@ class TarantoolWidget(OWWidget):
 
             for i in range(self.tuples.shape[1]):
                 self.domain_editor.insertRow(i)
-                item = QTableWidgetItem('Feature %d' % (i + 1))
+
+                if i not in self.schema[self.schema_key].keys():
+                    self.schema[self.schema_key][i] = 'Feature %d' % (i + 1)
+                item = QTableWidgetItem(self.schema[self.schema_key][i])
                 self.domain_editor.setItem(i, 0, item)
+
                 item = QTableWidgetItem('Numeric')
                 item.setFlags(flags)
                 self.domain_editor.setItem(i, 1, item)
@@ -96,6 +119,7 @@ class TarantoolWidget(OWWidget):
                 self.domain_editor.setItem(i, 6, item)
 
             self.domain_editor.resizeColumnsToContents()
+            self.apply_button.setEnabled(True)
             self.Error.error.clear()
         except (tarantool.error.DatabaseError, tarantool.error.InterfaceError) as e:
             self.Error.error(e)
