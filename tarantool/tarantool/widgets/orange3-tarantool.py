@@ -44,8 +44,8 @@ class TarantoolWidget(OWWidget):
 
         load_button = gui.button(self.controlArea, self, "Load", callback=self.load_data, autoDefault=False)
 
-        self.domain_editor = QTableWidget(0, 6, self)
-        self.domain_editor.setHorizontalHeaderLabels(['Name', 'Type', 'Miss', 'Min', 'Max', 'Mean'])
+        self.domain_editor = QTableWidget(0, 7, self)
+        self.domain_editor.setHorizontalHeaderLabels(['Name', 'Type', 'Miss', 'Min', 'Max', 'Mean', 'Std'])
         self.controlArea.layout().addWidget(self.domain_editor)
 
         apply_button = gui.button(self.controlArea, self, "Apply", callback=self.apply_data, autoDefault=False)
@@ -63,6 +63,7 @@ class TarantoolWidget(OWWidget):
             self.tuples_min = np.nanmin(self.tuples, axis=0)
             self.tuples_max = np.nanmax(self.tuples, axis=0)
             self.tuples_mean = np.nanmean(self.tuples, axis=0)
+            self.tuples_std = np.nanstd(self.tuples, axis=0)
 
             flags = Qt.ItemFlags()
             flags != Qt.ItemIsEnabled
@@ -90,6 +91,9 @@ class TarantoolWidget(OWWidget):
                 item = QTableWidgetItem("%.2e" % self.tuples_mean[i])
                 item.setFlags(flags)
                 self.domain_editor.setItem(i, 5, item)
+                item = QTableWidgetItem("%.2e" % self.tuples_std[i])
+                item.setFlags(flags)
+                self.domain_editor.setItem(i, 6, item)
 
             self.domain_editor.resizeColumnsToContents()
             self.Error.error.clear()
