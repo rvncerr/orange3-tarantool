@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 NAME = "Orange3 Tarantool"
 
-VERSION = "0.1"
+VERSION = "0.0.1"
 
 DESCRIPTION = "Tarantool Connector for Orange3"
 LONG_DESCRIPTION = open(path.join(path.dirname(__file__), 'README.md')).read()
