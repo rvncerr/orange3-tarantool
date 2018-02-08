@@ -14,6 +14,7 @@ import tarantool
 class TarantoolWidget(OWWidget):
     name = "Tarantool"
     category = "Tarantool"
+    description = "Read data from an Tarantool database and send a data table to the output."
     icon = "icons/tarantool.svg"
     want_main_area = False
 
