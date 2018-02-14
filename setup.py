@@ -6,18 +6,17 @@ from setuptools import setup, find_packages
 
 if __name__ == '__main__':
     setup(
-        name='Orange3 Tarantool',
-        version='0.0.1.dev1',
+        name='Orange3-Tarantool',
+        version='0.0.1.dev5',
         description='Tarantool Connector for Orange3',
         long_description=open(path.join(path.dirname(__file__), 'README.md')).read(),
         license='GPL',
-        packages=find_packages(),
-        package_data={'tarantool.tarantool.widgets': ['icons/*']},
+        packages=['rvncerr.orange3', 'rvncerr.orange3.widgets'],
+        package_data={'rvncerr.orange3.widgets': ['icons/*']},
         data_files=[],
         install_requires=['Orange3', 'tarantool'],
-        entry_points={'orange3.addon': ('Tarantool = tarantool.tarantool'), 'orange.widgets': ('Tarantool = tarantool.tarantool.widgets')},
+        entry_points={'orange3.addon': ('Tarantool = rvncerr.orange3'), 'orange.widgets': ('Tarantool = rvncerr.orange3.widgets')},
         keywords=('orange3 add-on'),
-        namespace_packages=['tarantool'],
         include_package_data=True,
         zip_safe=False,
         author='Dmitriy Kalugin-Balashov',

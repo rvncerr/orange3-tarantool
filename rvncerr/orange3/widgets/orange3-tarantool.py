@@ -45,7 +45,7 @@ class TarantoolWidget(OWWidget):
 
         data_box = gui.widgetBox(self.controlArea, 'Data')
         space_edit = gui.lineEdit(data_box, self, 'space', 'Space')
-        index_spin = gui.spin(data_box, self, 'index', 0, 32, label='Index')
+        index_spin = gui.spin(data_box, self, 'index', 0, 127, label='Index')
         filter_edit = gui.lineEdit(data_box, self, 'select', 'Filter')
 
         load_button = gui.button(self.controlArea, self, "Load", callback=self.load_data, autoDefault=False)
