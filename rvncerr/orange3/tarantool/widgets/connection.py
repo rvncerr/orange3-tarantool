@@ -11,7 +11,7 @@ class ConnectionWidget(OWWidget):
     name = "Connection"
     category = "Tarantool"
     description = "Connection to Tarantool database."
-    icon = "icons/connection.svg"
+    icon = "icons/tarantool.svg"
     want_main_area = False
     priority = 0
 
