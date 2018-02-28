@@ -122,13 +122,28 @@ class LuaWidget(OWWidget):
     def __init__(self):
         super().__init__()
 
+        layout = QGridLayout()
+        gui.widgetBox(self.controlArea, margin=0, orientation=layout)
+
+        #self.controlArea = QWidget(self.controlArea)
+        #self.layout().addWidget(self.controlArea)
+        #layout = QGridLayout()
+        #layout.setContentsMargins(4, 4, 4, 4)
+        #self.controlArea.setLayout(layout)
+
+        self.controlBox = gui.vBox(self, 'Info')
+        layout.addWidget(self.controlBox, 0, 0, 0, 1)
+
+        #self.splitCanvas = QSplitter(Qt.Vertical, self.controlArea)
+        #self.controlArea.layout().addWidget(self.splitCanvas, 0, 2, 0, 2)
+
         self.text = LuaEditor(self.controlArea)
-        self.controlArea.layout().addWidget(self.text)
+        layout.addWidget(self.text, 0, 2, 0, 4)
         self.text.setTabStopWidth(4)
-        self.text.setFont(QFont('Courier New', 12))
+        self.text.setFont(QFont('Courier New', 10))
         self.highlighter = LuaSyntaxHighlighter(self.text.document())
 
-        self.runButton = gui.button(self.controlArea, self, 'Run', callback=self.run, autoDefault=False)
+        self.runButton = gui.button(self.controlBox, self, 'Run', callback=self.run, autoDefault=False)
 
     def run(self):
         try:
