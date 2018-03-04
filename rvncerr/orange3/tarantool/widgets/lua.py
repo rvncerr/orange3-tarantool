@@ -109,6 +109,7 @@ class LuaWidget(OWWidget):
     priority = 1
 
     _connection = None
+    _code = Setting('', schema_only=True)
 
     class Error(OWWidget.Error):
         error = widget.Msg("{}")
@@ -117,47 +118,70 @@ class LuaWidget(OWWidget):
         connection = Input('Connection', tarantool.Connection)
 
     class Outputs:
-        data = Output('Data', Table)
+        connection = Output('Connection', tarantool.Connection)
+        data = Output('Response', tarantool.response.Response)
 
     def __init__(self):
         super().__init__()
 
-        layout = QGridLayout()
-        gui.widgetBox(self.controlArea, margin=0, orientation=layout)
+        self.toolBar = QToolBar()
+        self.toolBar.setFloatable(False)
+        self.toolBar.setMovable(False)
+        self.controlArea.layout().addWidget(self.toolBar)
 
-        #self.controlArea = QWidget(self.controlArea)
-        #self.layout().addWidget(self.controlArea)
-        #layout = QGridLayout()
-        #layout.setContentsMargins(4, 4, 4, 4)
-        #self.controlArea.setLayout(layout)
+        self.toolButtonLoad = QToolButton()
+        self.toolButtonLoad.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/toolbar/load.svg'))
+        self.toolButtonLoad.clicked.connect(self.load)
+        self.toolBar.addWidget(self.toolButtonLoad)
 
-        self.controlBox = gui.vBox(self, 'Info')
-        layout.addWidget(self.controlBox, 0, 0, 0, 1)
+        self.toolButtonSave = QToolButton()
+        self.toolButtonSave.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/toolbar/save.svg'))
+        self.toolButtonSave.clicked.connect(self.save)
+        self.toolBar.addWidget(self.toolButtonSave)
 
-        #self.splitCanvas = QSplitter(Qt.Vertical, self.controlArea)
-        #self.controlArea.layout().addWidget(self.splitCanvas, 0, 2, 0, 2)
+        self.toolBar.addSeparator()
+
+        self.toolButtonRun = QToolButton()
+        self.toolButtonRun.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/toolbar/run.svg'))
+        self.toolButtonRun.clicked.connect(self.run)
+        self.toolBar.addWidget(self.toolButtonRun)
 
         self.text = LuaEditor(self.controlArea)
-        layout.addWidget(self.text, 0, 2, 0, 4)
+        self.text.modificationChanged[bool].connect(self._save_code)
+        self.controlArea.layout().addWidget(self.text)
         self.text.setTabStopWidth(4)
         self.text.setFont(QFont('Courier New', 10))
         self.highlighter = LuaSyntaxHighlighter(self.text.document())
+        self._load_code()
 
-        self.runButton = gui.button(self.controlBox, self, 'Run', callback=self.run, autoDefault=False)
+    def _save_code(self):
+        self.text.document().setModified(False)
+        self._code = self.text.toPlainText()
+
+    def _load_code(self):
+        self.text.setPlainText(self._code)
+
+    def load(self):
+        fn = QFileDialog.getOpenFileName(self, 'Load Lua', '', 'Lua Scripts (*.lua)')
+        fd = open(fn, 'r')
+        self._code = fd.readlines
+
+    def save(self):
+        QFileDialog.getSaveFileName(self, 'Load Lua', '', 'Lua Scripts (*.lua)')
 
     def run(self):
+        self.Outputs.connection.send(None)
         try:
             if self._connection is not None:
                 result = self._connection.eval(self.text.toPlainText())
-                self.tuples = np.array(result)
-                if len(self.tuples.shape) == 2:
-                    self.domain = Domain([ContinuousVariable('field_%d' % i) for i in range(self.tuples.shape[1])])
-                    self.table = Table.from_numpy(self.domain, self.tuples)
-                    self.Outputs.data.send(self.table)
-                else:
-                    self.Outputs.data.send(None)
+                self.Outputs.data.send(result)
+                self.Outputs.connection.send(self._connection)
+            else:
+                self.Outputs.data.send(None)
             self.Error.error.clear()
         except (tarantool.error.DatabaseError, tarantool.error.InterfaceError) as e:
+            self.Outputs.connection.send(None)
+            self.Outputs.data.send(None)
             self.Error.error(e)
 
     @Inputs.connection

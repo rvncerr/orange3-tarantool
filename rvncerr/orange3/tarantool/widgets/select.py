@@ -34,8 +34,8 @@ class SelectWidget(OWWidget):
         space = Input('Space', tarantool.space.Space)
 
     class Outputs:
-        # query = Output('Query', )
         data = Output('Data', Table)
+        tuples = Output('Response', tarantool.response.Response)
 
     def __init__(self):
         super().__init__()
@@ -63,9 +63,9 @@ class SelectWidget(OWWidget):
                 self.raw_tuples = self._space.select(index=self.index)
             else:
                 self.raw_tuples = self._space.select(int(self.filterexpr), index=self.index)
-            self.tuples = np.array(self.raw_tuples)
-            #self.domain = Domain([ContinuousVariable("field_%d" % i) for i in range(self.tuples.shape[1])])
+            self.Outputs.tuples.send(self.raw_tuples)
 
+            self.tuples = np.array(self.raw_tuples)
             self._raw_domain = []
             for i in range(self.tuples.shape[1]):
                 if i in self._schema.keys():
@@ -78,4 +78,6 @@ class SelectWidget(OWWidget):
             self.Outputs.data.send(self.table)
             self.Error.error.clear()
         except (tarantool.error.DatabaseError, tarantool.error.InterfaceError) as e:
+            self.Outputs.tuples.send(None)
+            self.Outputs.data.send(None)
             self.Error.error(e)
