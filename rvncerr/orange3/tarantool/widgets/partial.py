@@ -11,11 +11,11 @@ import numpy as np
 import tarantool
 
 
-class SelectWidget(OWWidget):
-    name = "Select"
+class PartialSelectWidget(OWWidget):
+    name = "Partial Select"
     category = "Tarantool"
     description = "Select from Tarantool space."
-    icon = "icons/select.svg"
+    icon = "icons/partial.svg"
     want_main_area = False
     priority = 2
 

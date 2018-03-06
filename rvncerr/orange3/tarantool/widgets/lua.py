@@ -174,7 +174,10 @@ class LuaWidget(OWWidget):
         try:
             if self._connection is not None:
                 result = self._connection.eval(self.text.toPlainText())
-                self.Outputs.data.send(result)
+                if len(result) != 0:
+                    self.Outputs.data.send(result)
+                else:
+                    self.Outputs.data.send(None)
                 self.Outputs.connection.send(self._connection)
             else:
                 self.Outputs.data.send(None)

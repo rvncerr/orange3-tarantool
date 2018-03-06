@@ -41,7 +41,8 @@ class TupleWidget(OWWidget):
     def _build_table(self):
         self.Warning.warning("")
         if len(self._data) > 0:
-            # print(self._data)
+            if type(self._data[0][0]) == list:
+                self._data = self._data[0]
 
             minTuple = len(self._data[0])
             for oneTuple in self._data:
@@ -63,7 +64,7 @@ class TupleWidget(OWWidget):
             if i < minTuple:
                 self.Warning.warning("Schema is not full.")
             while i < minTuple:
-                rawDomain.append(ContinuousVariable("field_%d" % i))
+                rawDomain.append(ContinuousVariable("field_%d" %  + 1))
                 i = i + 1
 
             table = Table(Domain(rawDomain), _cleanData)
@@ -79,10 +80,7 @@ class TupleWidget(OWWidget):
     @Inputs.response
     def signal_response(self, response):
         if response is not None:
-            if len(response.data) > 0:
-                self._data = response.data[0]
-            else:
-                self._data = []
+            self._data = response.data
         else:
             self._data = []
         self._build_table()
