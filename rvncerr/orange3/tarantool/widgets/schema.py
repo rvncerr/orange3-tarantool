@@ -17,7 +17,7 @@ class SchemaWidget(OWWidget):
     description = "Schema of Tarantool space."
     icon = "icons/schema.svg"
     want_main_area = False
-    priority = 3
+    priority = 11
 
     _connection = None
     _space = None

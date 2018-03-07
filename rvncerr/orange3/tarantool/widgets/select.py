@@ -17,14 +17,14 @@ class SelectWidget(OWWidget):
     description = "Select from Tarantool space."
     icon = "icons/select.svg"
     want_main_area = False
-    priority = 100
+    priority = 1000
 
-    index = Setting(0)
     filterexpr = Setting(0)
     limit = Setting(0)
 
     _connection = None
     _space = None
+    _index = 0
     raw_tuples = []
 
     class Error(OWWidget.Error):
@@ -32,18 +32,17 @@ class SelectWidget(OWWidget):
 
     class Inputs:
         space = Input('Space', tarantool.space.Space)
+        index = Input('Index', int)
 
     class Outputs:
-        #data = Output('Data', Table)
         tuples = Output('Response', tarantool.response.Response)
 
     def __init__(self):
         super().__init__()
 
-        index_spin = gui.spin(self.controlArea, self, 'index', 0, 127, label='Index')
         filter_edit = gui.lineEdit(self.controlArea, self, 'filterexpr', 'Filter')
         limit_spin = gui.spin(self.controlArea, self, 'limit', 0, 1e6, label='Limit')
-        select_button = gui.button(self.controlArea, self, "Select", callback=self.run_select, autoDefault=False)
+        select_button = gui.button(self.controlArea, self, 'Select', callback=self.run_select, autoDefault=False)
 
     def _run_select_if_possible(self):
         if self._space is not None:
@@ -56,12 +55,20 @@ class SelectWidget(OWWidget):
         self._space = space
         self._run_select_if_possible()
 
+    @Inputs.index
+    def signal_index(self, index):
+        if index is None:
+            self._index = 0
+        else:
+            self._index = index
+        self._run_select_if_possible()
+
     def run_select(self):
         try:
             if self.filterexpr == '':
-                self.raw_tuples = self._space.select(index=self.index)
+                self.raw_tuples = self._space.select(index=self._index)
             else:
-                self.raw_tuples = self._space.select(int(self.filterexpr), index=self.index)
+                self.raw_tuples = self._space.select(int(self.filterexpr), index=self._index)
             if len(self.raw_tuples) != 0:
                 self.Outputs.tuples.send(self.raw_tuples)
             else:

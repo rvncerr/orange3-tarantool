@@ -28,7 +28,7 @@ class TupleWidget(OWWidget):
     description = "Set of tuples."
     icon = "icons/tuple.svg"
     want_main_area = False
-    priority = 5
+    priority = 13
 
     _domain = Domain([])
     _data = []
@@ -89,16 +89,17 @@ class TupleWidget(OWWidget):
 
             rawDomain = []
             i = 0
-            for variable in self._domain.variables:
-                if i < minTuple:
-                    rawDomain.append(variable)
-                    i = i + 1
-                else:
-                    break
+            if self._domain is not None:
+                for variable in self._domain.variables:
+                    if i < minTuple:
+                        rawDomain.append(variable)
+                        i = i + 1
+                    else:
+                        break
             if i < minTuple:
                 self.Warning.warning("Schema is not full.")
             while i < minTuple:
-                rawDomain.append(ContinuousVariable("field_%d" % i + 1))
+                rawDomain.append(ContinuousVariable("field_%d" % (i + 1)))
                 i = i + 1
 
             table = Table(Domain(rawDomain), _cleanData)

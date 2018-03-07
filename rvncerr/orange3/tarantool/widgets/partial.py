@@ -17,9 +17,8 @@ class PartialSelectWidget(OWWidget):
     description = "Select from Tarantool space."
     icon = "icons/partial.svg"
     want_main_area = False
-    priority = 101
+    priority = 1001
 
-    # filterexpr = Setting(0)
     part = Setting(10)
 
     _connection = None
@@ -33,7 +32,6 @@ class PartialSelectWidget(OWWidget):
         space = Input('Space', tarantool.space.Space)
 
     class Outputs:
-        #data = Output('Data', Table)
         tuples = Output('Response', tarantool.response.Response)
 
     def __init__(self):
@@ -41,7 +39,7 @@ class PartialSelectWidget(OWWidget):
 
         # filter_edit = gui.lineEdit(self.controlArea, self, 'filterexpr', 'Filter')
         part_hslider = gui.hSlider(self.controlArea, self, 'part', minValue=0, maxValue=100)
-        select_button = gui.button(self.controlArea, self, "Select", callback=self.run_select, autoDefault=False)
+        select_button = gui.button(self.controlArea, self, 'Select', callback=self.run_select, autoDefault=False)
 
     def _run_select_if_possible(self):
         if self._space is not None:
@@ -56,7 +54,7 @@ class PartialSelectWidget(OWWidget):
 
     def run_select(self):
         try:
-            self.raw_tuples = self._space.connection.eval("return orange_partial_select(%d, %f)" % (self._space.space_no, self.part/100.))
+            self.raw_tuples = self._space.connection.call("orange_partial_select", (self._space.space_no, self.part/100.))
             if len(self.raw_tuples) != 0:
                 self.Outputs.tuples.send(self.raw_tuples)
             else:

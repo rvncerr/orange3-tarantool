@@ -10,19 +10,17 @@ from AnyQt.QtWidgets import *
 import numpy as np
 import tarantool
 
-
 class IndexWidget(OWWidget):
     name = "Index"
     category = "Tarantool"
     description = "Index of Tarantool space."
     icon = "icons/index.svg"
     want_main_area = False
-    priority = 4
+    priority = 12
 
-    _connection = None
     _space = None
-    _schema = dict()
-    _domain = Domain([])
+    _indexes = []
+    _index_id = 0
 
     class Error(OWWidget.Error):
         error = widget.Msg("{}")
@@ -31,33 +29,38 @@ class IndexWidget(OWWidget):
         space = Input('Space', tarantool.space.Space)
 
     class Outputs:
-        domain = Output('Index', tarantool.schema.SchemaIndex)
+        index = Output('Index', int)
 
     def __init__(self):
         super().__init__()
+        self.index_listbox = gui.listBox(self.controlArea, self)
+        select_button = gui.button(self.controlArea, self, 'Select', callback=self._select_index, autoDefault=False)
+
+    def _draw_indexes(self):
+        self.index_listbox.clear()
+        for index in self._indexes:
+            item = QListWidgetItem()
+            item.setText("{}".format(index))
+            item.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/index.svg'))
+            self.index_listbox.addItem(item)
+
+    def _select_index(self):
+        i = self.index_listbox.currentRow()
+        self._index_id = self._indexes[i][1]
+        if self._index_id != 0 and len(self._indexes) != 0:
+            self.Outputs.index.send(self._index_id)
+        else:
+            self.Outputs.index.send(None)
 
     @Inputs.space
     def signal_space(self, space):
         self._space = space
         if space is not None:
-            _raw_domain = []
-
-            self._schema = self._space.connection.schema.get_space(self._space.space_no).format
-            i = 0
-            while True:
-                if i in self._schema.keys():
-                    _raw_domain.append(ContinuousVariable(self._schema[i]['name']))
-                else:
-                    break
-                i = i + 1
-
-            if len(_raw_domain) > 0:
-                self._domain = Domain(_raw_domain)
-                #self.Outputs.domain.send(self._domain)
-            else:
-                self._domain = Domain([])
-                #self.Outputs.domain.send(None)
+            self._indexes = self._space.connection.schema.fetch_index_from(self._space.space_no, None).data
         else:
-            self._schema = dict()
-            self._domain = Domain([])
-            #self.Outputs.domain.send(None)
+            self._indexes = []
+        self._draw_indexes()
+        if self._index_id != 0 and len(self._indexes) != 0:
+            self.Outputs.index.send(self._index_id)
+        else:
+            self.Outputs.index.send(None)
