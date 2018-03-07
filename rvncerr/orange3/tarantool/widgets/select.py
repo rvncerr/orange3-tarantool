@@ -17,7 +17,7 @@ class SelectWidget(OWWidget):
     description = "Select from Tarantool space."
     icon = "icons/select.svg"
     want_main_area = False
-    priority = 2
+    priority = 100
 
     index = Setting(0)
     filterexpr = Setting(0)
@@ -46,15 +46,15 @@ class SelectWidget(OWWidget):
         select_button = gui.button(self.controlArea, self, "Select", callback=self.run_select, autoDefault=False)
 
     def _run_select_if_possible(self):
-        pass
+        if self._space is not None:
+            self.run_select()
+        else:
+            self.Outputs.tuples.send(None)
 
     @Inputs.space
     def signal_space(self, space):
         self._space = space
-        if space is not None:
-            self._schema = space.connection.schema.get_space(space.space_no).format
-        else:
-            self._schema = dict()
+        self._run_select_if_possible()
 
     def run_select(self):
         try:

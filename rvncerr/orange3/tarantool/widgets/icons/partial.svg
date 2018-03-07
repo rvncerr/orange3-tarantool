@@ -4,10 +4,10 @@
     <path d="M 20 80 L 60 80 A 5 5 0 0 1 60 90 L 20 90 A 5 5 0 0 1 20 80" stroke="black" stroke-width="4" fill="white" />
     <path d="M 70 70 L 80 70 A 5 5 0 0 1 80 80 L 70 80 A 5 5 0 0 1 70 70" stroke="black" stroke-width="4" fill="white" />
     <polyline points="20,40 40,40 40,60 50,60, 30,80 10,60 20,60 20,40 40,40" stroke="red" stroke-width="4" fill="white" />
-    <polyline points="60,30 90,30 90,60 60,60 60,30 90,30" stroke="red" stroke-width="4" fill="white" />
-    <circle cx="67.5" cy="37.5" r="2"  stroke="red" stroke-width="4" fill="white" />
-    <circle cx="67.5" cy="52.5" r="2"  stroke="red" stroke-width="4" fill="white" />
-    <circle cx="82.5" cy="37.5" r="2"  stroke="red" stroke-width="4" fill="white" />
-    <circle cx="82.5" cy="52.5" r="2"  stroke="red" stroke-width="4" fill="white" />
-    <circle cx="75.0" cy="45.0" r="2"  stroke="red" stroke-width="4" fill="white" />
+    <polyline points="50,20 80,20 80,50 50,50 50,20 80,20" stroke="red" stroke-width="4" fill="white" />
+    <circle cx="57.5" cy="27.5" r="2"  stroke="red" stroke-width="4" fill="white" />
+    <circle cx="57.5" cy="42.5" r="2"  stroke="red" stroke-width="4" fill="white" />
+    <circle cx="72.5" cy="27.5" r="2"  stroke="red" stroke-width="4" fill="white" />
+    <circle cx="72.5" cy="42.5" r="2"  stroke="red" stroke-width="4" fill="white" />
+    <circle cx="65.0" cy="35.0" r="2"  stroke="red" stroke-width="4" fill="white" />
 </svg>

@@ -44,6 +44,7 @@ class ConnectionWidget(OWWidget):
                 self.database = tarantool.connect(self.host, self.port)
             else:
                 self.database = tarantool.connect(self.host, self.port, user=self.user, password=self.passwd)
+            self.database.eval(open('rvncerr/orange3/tarantool/lua/orange.lua', 'r').read())
             self.Outputs.connection.send(self.database)
             self.disconnect_button.setEnabled(True)
             self.connect_button.setEnabled(False)

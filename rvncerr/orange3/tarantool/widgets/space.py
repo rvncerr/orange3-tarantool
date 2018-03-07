@@ -17,7 +17,7 @@ class SpaceWidget(OWWidget):
     description = "Space in Tarantool database."
     icon = "icons/space.svg"
     want_main_area = False
-    priority = 1
+    priority = 2
 
     _space = None
     _connection = None

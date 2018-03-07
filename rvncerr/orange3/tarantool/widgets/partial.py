@@ -17,11 +17,10 @@ class PartialSelectWidget(OWWidget):
     description = "Select from Tarantool space."
     icon = "icons/partial.svg"
     want_main_area = False
-    priority = 2
+    priority = 101
 
-    index = Setting(0)
-    filterexpr = Setting(0)
-    limit = Setting(0)
+    # filterexpr = Setting(0)
+    part = Setting(10)
 
     _connection = None
     _space = None
@@ -40,28 +39,24 @@ class PartialSelectWidget(OWWidget):
     def __init__(self):
         super().__init__()
 
-        index_spin = gui.spin(self.controlArea, self, 'index', 0, 127, label='Index')
-        filter_edit = gui.lineEdit(self.controlArea, self, 'filterexpr', 'Filter')
-        limit_spin = gui.spin(self.controlArea, self, 'limit', 0, 1e6, label='Limit')
+        # filter_edit = gui.lineEdit(self.controlArea, self, 'filterexpr', 'Filter')
+        part_hslider = gui.hSlider(self.controlArea, self, 'part', minValue=0, maxValue=100)
         select_button = gui.button(self.controlArea, self, "Select", callback=self.run_select, autoDefault=False)
 
     def _run_select_if_possible(self):
-        pass
+        if self._space is not None:
+            self.run_select()
+        else:
+            self.Outputs.tuples.send(None)
 
     @Inputs.space
     def signal_space(self, space):
         self._space = space
-        if space is not None:
-            self._schema = space.connection.schema.get_space(space.space_no).format
-        else:
-            self._schema = dict()
+        self._run_select_if_possible()
 
     def run_select(self):
         try:
-            if self.filterexpr == '':
-                self.raw_tuples = self._space.select(index=self.index)
-            else:
-                self.raw_tuples = self._space.select(int(self.filterexpr), index=self.index)
+            self.raw_tuples = self._space.connection.eval("return orange_partial_select(%d, %f)" % (self._space.space_no, self.part/100.))
             if len(self.raw_tuples) != 0:
                 self.Outputs.tuples.send(self.raw_tuples)
             else:

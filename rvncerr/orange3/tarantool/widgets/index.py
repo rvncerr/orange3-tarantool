@@ -17,7 +17,7 @@ class IndexWidget(OWWidget):
     description = "Index of Tarantool space."
     icon = "icons/index.svg"
     want_main_area = False
-    priority = 2
+    priority = 4
 
     _connection = None
     _space = None

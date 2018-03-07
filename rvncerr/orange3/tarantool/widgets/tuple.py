@@ -10,6 +10,17 @@ from AnyQt.QtWidgets import *
 import numpy as np
 import tarantool
 
+def depth(l):
+    if type(l) != list:
+        return 0
+    if len(l) == 0:
+        return 1
+    s = 0
+    for ll in l:
+        dll = depth(ll)
+        if dll > s:
+            s = dll
+    return 1 + s
 
 class TupleWidget(OWWidget):
     name = "Tuple Set"
@@ -17,7 +28,7 @@ class TupleWidget(OWWidget):
     description = "Set of tuples."
     icon = "icons/tuple.svg"
     want_main_area = False
-    priority = 2
+    priority = 5
 
     _domain = Domain([])
     _data = []
@@ -38,11 +49,34 @@ class TupleWidget(OWWidget):
     def __init__(self):
         super().__init__()
 
+        self.tuple_listbox = gui.listBox(self.controlArea, self)
+
+    def _clean_table(self):
+        while depth(self._data) > 2:
+            self._data = self._data[0]
+        while depth(self._data) < 2:
+            self._data = [self._data]
+
     def _build_table(self):
         self.Warning.warning("")
+        self.tuple_listbox.clear()
+        self._clean_table()
+
         if len(self._data) > 0:
-            if type(self._data[0][0]) == list:
-                self._data = self._data[0]
+            dataCount = 0
+            for dataTuple in self._data:
+                if dataCount < 100:
+                    item = QListWidgetItem()
+                    item.setText("{}".format(dataTuple))
+                    item.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/tuple.svg'))
+                    self.tuple_listbox.addItem(item)
+                else:
+                    item = QListWidgetItem()
+                    item.setText('(--- 100 tuples ---)')
+                    item.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/tuple.svg'))
+                    self.tuple_listbox.addItem(item)
+                    break
+                dataCount = dataCount + 1
 
             minTuple = len(self._data[0])
             for oneTuple in self._data:
@@ -64,7 +98,7 @@ class TupleWidget(OWWidget):
             if i < minTuple:
                 self.Warning.warning("Schema is not full.")
             while i < minTuple:
-                rawDomain.append(ContinuousVariable("field_%d" %  + 1))
+                rawDomain.append(ContinuousVariable("field_%d" % i + 1))
                 i = i + 1
 
             table = Table(Domain(rawDomain), _cleanData)
