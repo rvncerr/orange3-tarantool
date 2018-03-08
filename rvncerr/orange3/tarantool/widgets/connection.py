@@ -48,6 +48,7 @@ class ConnectionWidget(OWWidget):
             self.Outputs.connection.send(self.database)
             self.disconnect_button.setEnabled(True)
             self.connect_button.setEnabled(False)
+            # self.setCaption("%s:%d" % (self.host, self.port))
             self.Error.error.clear()
         except (tarantool.error.DatabaseError, tarantool.error.InterfaceError) as e:
             self.Error.error(e)
