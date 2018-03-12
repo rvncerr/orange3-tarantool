@@ -63,9 +63,9 @@ function orange_correlation(space_name)
 end
 
 -- PartialSelectWidget.
-function orange_partial_select(space_name, probability)
+function orange_partial_select(space_name, index, probability)
     space = box.space[space_name]
-    data = space:select({})
+    data = space:select({}, {index=index})
     partial_data = {}
     for _, tuple in ipairs(data) do
         if math.random() < probability then

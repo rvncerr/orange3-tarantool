@@ -35,10 +35,12 @@ class SchemaWidget(OWWidget):
 
     def __init__(self):
         super().__init__()
+        self.schema_listbox = gui.listBox(self.controlArea, self)
 
     @Inputs.space
     def signal_space(self, space):
         self._space = space
+        self.schema_listbox.clear()
         if space is not None:
             _raw_domain = []
 
@@ -47,6 +49,11 @@ class SchemaWidget(OWWidget):
             while True:
                 if i in self._schema.keys():
                     _raw_domain.append(ContinuousVariable(self._schema[i]['name']))
+
+                    item = QListWidgetItem()
+                    item.setText("{}".format(self._schema[i]))
+                    item.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/schema.svg'))
+                    self.schema_listbox.addItem(item)
                 else:
                     break
                 i = i + 1

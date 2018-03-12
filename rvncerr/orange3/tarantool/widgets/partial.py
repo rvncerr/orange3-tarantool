@@ -23,6 +23,7 @@ class PartialSelectWidget(OWWidget):
 
     _connection = None
     _space = None
+    _index = 0
     raw_tuples = []
 
     class Error(OWWidget.Error):
@@ -30,6 +31,7 @@ class PartialSelectWidget(OWWidget):
 
     class Inputs:
         space = Input('Space', tarantool.space.Space)
+        index = Input('Index', int)
 
     class Outputs:
         tuples = Output('Response', tarantool.response.Response)
@@ -52,9 +54,17 @@ class PartialSelectWidget(OWWidget):
         self._space = space
         self._run_select_if_possible()
 
+    @Inputs.index
+    def signal_index(self, index):
+        if index is None:
+            self._index = 0
+        else:
+            self._index = index
+        self._run_select_if_possible()
+
     def run_select(self):
         try:
-            self.raw_tuples = self._space.connection.call("orange_partial_select", (self._space.space_no, self.part/100.))
+            self.raw_tuples = self._space.connection.call("orange_partial_select", (self._space.space_no, self._index, self.part/100.))
             if len(self.raw_tuples) != 0:
                 self.Outputs.tuples.send(self.raw_tuples)
             else:
