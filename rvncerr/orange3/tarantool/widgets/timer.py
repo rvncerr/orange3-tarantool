@@ -53,4 +53,5 @@ class TimerWidget(OWWidget):
         delay_hslider = gui.hSlider(self.controlArea, self, 'delay', minValue=1, maxValue=60)
 
         self.thread = threading.Thread(target=self._thread_func)
+        self.thread.daemon = True
         self.thread.start()
