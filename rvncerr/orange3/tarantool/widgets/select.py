@@ -33,6 +33,7 @@ class SelectWidget(OWWidget):
     class Inputs:
         space = Input('Space', tarantool.space.Space)
         index = Input('Index', int)
+        trigger = Input('Trigger', bool)
 
     class Outputs:
         tuples = Output('Response', tarantool.response.Response)
@@ -49,6 +50,11 @@ class SelectWidget(OWWidget):
             self.run_select()
         else:
             self.Outputs.tuples.send(None)
+
+    @Inputs.trigger
+    def signal_trigger(self, trigger):
+        if trigger is not None:
+            self._run_select_if_possible()
 
     @Inputs.space
     def signal_space(self, space):
