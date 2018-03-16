@@ -9,7 +9,7 @@ from AnyQt.QtWidgets import *
 
 import numpy as np
 import tarantool
-
+from pathlib import Path
 
 class SchemaWidget(OWWidget):
     name = "Schema"
@@ -52,7 +52,7 @@ class SchemaWidget(OWWidget):
 
                     item = QListWidgetItem()
                     item.setText("{}".format(self._schema[i]))
-                    item.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/schema.svg'))
+                    item.setIcon(QIcon(str(Path(__file__).parents[0]) + '/icons/schema.svg'))
                     self.schema_listbox.addItem(item)
                 else:
                     break

@@ -9,6 +9,7 @@ from AnyQt.QtWidgets import *
 
 import numpy as np
 import tarantool
+from pathlib import Path
 
 def depth(l):
     if type(l) != list:
@@ -68,12 +69,12 @@ class TupleWidget(OWWidget):
                 if dataCount < 100:
                     item = QListWidgetItem()
                     item.setText("{}".format(dataTuple))
-                    item.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/tuple.svg'))
+                    item.setIcon(QIcon(str(Path(__file__).parents[0]) + '/icons/tuple.svg'))
                     self.tuple_listbox.addItem(item)
                 else:
                     item = QListWidgetItem()
                     item.setText('(--- 100 tuples ---)')
-                    item.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/tuple.svg'))
+                    item.setIcon(QIcon(str(Path(__file__).parents[0]) + '/icons/tuple.svg'))
                     self.tuple_listbox.addItem(item)
                     break
                 dataCount = dataCount + 1

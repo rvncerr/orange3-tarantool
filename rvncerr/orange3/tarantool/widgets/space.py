@@ -9,7 +9,7 @@ from AnyQt.QtWidgets import *
 
 import numpy as np
 import tarantool
-
+from pathlib import Path
 
 class SpaceWidget(OWWidget):
     name = "Space"
@@ -47,7 +47,7 @@ class SpaceWidget(OWWidget):
                 if space[2][0] != '_':
                     item = QListWidgetItem()
                     item.setText(space[2])
-                    item.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/space.svg'))
+                    item.setIcon(QIcon(str(Path(__file__).parents[0]) + '/icons/space.svg'))
                     self.space_listbox.addItem(item)
 
     def update_output(self):

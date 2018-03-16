@@ -5,7 +5,7 @@ from Orange.widgets import widget, gui
 
 import numpy as np
 import tarantool
-
+from pathlib import Path
 
 class ConnectionWidget(OWWidget):
     name = "Connection"
@@ -44,7 +44,8 @@ class ConnectionWidget(OWWidget):
                 self.database = tarantool.connect(self.host, self.port)
             else:
                 self.database = tarantool.connect(self.host, self.port, user=self.user, password=self.passwd)
-            self.database.eval(open('rvncerr/orange3/tarantool/lua/orange.lua', 'r').read())
+            # self.database.eval(open('lua/orange.lua', 'r').read())
+            self.database.eval(open(str(Path(__file__).parents[0]) + '/lua/orange.lua', 'r').read())
             self.Outputs.connection.send(self.database)
             self.disconnect_button.setEnabled(True)
             self.connect_button.setEnabled(False)

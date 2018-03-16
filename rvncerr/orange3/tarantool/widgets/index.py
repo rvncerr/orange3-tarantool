@@ -9,6 +9,7 @@ from AnyQt.QtWidgets import *
 
 import numpy as np
 import tarantool
+from pathlib import Path
 
 class IndexWidget(OWWidget):
     name = "Index"
@@ -41,7 +42,7 @@ class IndexWidget(OWWidget):
         for index in self._indexes:
             item = QListWidgetItem()
             item.setText("{}".format(index))
-            item.setIcon(QIcon('rvncerr/orange3/tarantool/widgets/icons/index.svg'))
+            item.setIcon(QIcon(str(Path(__file__).parents[0]) + '/icons/index.svg'))
             self.index_listbox.addItem(item)
 
     def _select_index(self):
